@@ -1,44 +1,51 @@
 <?php
-require_once 'config.php';
+session_start();
 
-if (!isset($_SESSION['username'])) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Please pehle login karein.']);
-    exit;
+// Agar login zaroori hai to yeh check rakhein, warna hata dein
+$submitted_by = isset($_SESSION['username']) ? $_SESSION['username'] : 'guest';
+
+$name    = trim($_POST['name'] ?? '');
+$email   = trim($_POST['email'] ?? '');
+$address = trim($_POST['address'] ?? '');
+
+if ($name === '' || $email === '') {
+    die('Name aur Email zaroori hain.');
 }
 
-$data = json_decode(file_get_contents('php://input'), true);
+$dataFile = __DIR__ . '/submissions.json';
 
-$name    = isset($data['name']) ? trim($data['name']) : '';
-$email   = isset($data['email']) ? trim($data['email']) : '';
-$address = isset($data['address']) ? trim($data['address']) : '';
-
-if ($name === '' || $email === '' || $address === '') {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Saari fields bharni zaroori hain.']);
-    exit;
+// Agar file nahi hai to khaali array se banayein
+if (!file_exists($dataFile)) {
+    file_put_contents($dataFile, json_encode([]));
 }
 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Valid email address daalein.']);
-    exit;
+// Purana data padhein
+$jsonContent = file_get_contents($dataFile);
+$rows = json_decode($jsonContent, true);
+if (!is_array($rows)) {
+    $rows = [];
 }
 
-$pdo = getDbConnection();
+// Naya entry add karein
+$newId = count($rows) > 0 ? (end($rows)['id'] + 1) : 1;
+$rows[] = [
+    'id'            => $newId,
+    'name'          => $name,
+    'email'         => $email,
+    'address'       => $address,
+    'submitted_by'  => $submitted_by,
+    'created_at'    => date('Y-m-d H:i:s'),
+];
 
-$stmt = $pdo->prepare(
-    'INSERT INTO submissions (name, email, address, submitted_by) VALUES (:name, :email, :address, :submitted_by)'
-);
-$stmt->execute([
-    'name'         => $name,
-    'email'        => $email,
-    'address'      => $address,
-    'submitted_by' => $_SESSION['username'],
-]);
+// File lock ke saath wapas save karein (taaki ek saath do submissions clash na karein)
+$fp = fopen($dataFile, 'c+');
+if (flock($fp, LOCK_EX)) {
+    ftruncate($fp, 0);
+    fwrite($fp, json_encode($rows, JSON_PRETTY_PRINT));
+    fflush($fp);
+    flock($fp, LOCK_UN);
+}
+fclose($fp);
 
-echo json_encode([
-    'success' => true,
-    'message' => 'Aapka data safaltapoorvak save ho gaya hai.',
-    'id'      => $pdo->lastInsertId(),
-]);
+header('Location: submissions.php');
+exit;
