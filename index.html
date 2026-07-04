@@ -3,346 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Contact Form</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <title>Submit Data</title>
   <style>
     :root {
       --ink: #1c2430;
       --muted: #5c6675;
       --line: #d5dae2;
       --accent: #1a5fb4;
-      --accent-dark: #134a8e;
       --bg: #eef1f5;
       --card: #ffffff;
-      --ok-bg: #e6f4ea;
-      --ok-ink: #1e6b34;
-      --err-bg: #fdecea;
-      --err-ink: #b3261e;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: "Segoe UI", Roboto, Arial, sans-serif;
       background: var(--bg);
       color: var(--ink);
-      min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 24px 16px;
+      padding: 40px 16px;
     }
     .card {
       background: var(--card);
-      width: 100%;
-      max-width: 460px;
-      border-radius: 12px;
       border: 1px solid var(--line);
-      border-top: 5px solid var(--accent);
-      box-shadow: 0 8px 24px rgba(28, 36, 48, 0.08);
-      padding: 32px 28px;
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(28, 36, 48, 0.06);
     }
-    h1 { font-size: 1.45rem; font-weight: 600; margin-bottom: 6px; }
-    .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    .topbar .logout {
-      background: none;
-      border: none;
-      color: var(--accent);
-      font: inherit;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 0;
-    }
-    .topbar .logout:hover { text-decoration: underline; }
-    .field { margin-bottom: 18px; }
+    h1 { font-size: 1.3rem; margin-bottom: 4px; }
+    p.sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
     label {
       display: block;
       font-size: 0.85rem;
       font-weight: 600;
       margin-bottom: 6px;
+      margin-top: 14px;
     }
-    label .req { color: var(--err-ink); }
     input, textarea {
       width: 100%;
-      font: inherit;
-      font-size: 0.95rem;
       padding: 10px 12px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fbfcfe;
-      color: var(--ink);
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    textarea { resize: vertical; min-height: 84px; }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(26, 95, 180, 0.15);
-    }
-    button.primary {
-      width: 100%;
-      font: inherit;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #fff;
-      background: var(--accent);
-      border: none;
-      border-radius: 8px;
-      padding: 12px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    button.primary:hover { background: var(--accent-dark); }
-    button.primary:focus-visible { outline: 3px solid rgba(26, 95, 180, 0.4); outline-offset: 2px; }
-    button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
-    .msg {
-      display: none;
-      margin-top: 16px;
-      padding: 10px 14px;
-      border-radius: 8px;
       font-size: 0.9rem;
+      font-family: inherit;
     }
-    .msg.ok  { display: block; background: var(--ok-bg);  color: var(--ok-ink); }
-    .msg.err { display: block; background: var(--err-bg); color: var(--err-ink); }
-    .hidden { display: none; }
+    textarea { resize: vertical; min-height: 70px; }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { opacity: 0.9; }
+    .link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Submit Details</h1>
+    <p class="sub">Fill the form neeche diya gaya, data automatically save ho jayega.</p>
+    <form action="submit.php" method="POST">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required>
 
-  <div class="card" id="loginCard">
-    <h1>Sign in</h1>
-    <p class="sub">Enter your login ID and password to continue.</p>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
 
-    <div class="field">
-      <label for="loginUser">Login ID <span class="req">*</span></label>
-      <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
-    </div>
+      <label for="address">Address</label>
+      <textarea id="address" name="address"></textarea>
 
-    <div class="field">
-      <label for="loginPass">Password <span class="req">*</span></label>
-      <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
-    </div>
-
-    <button class="primary" id="loginBtn" onclick="doLogin()">Sign in</button>
-    <div id="loginMsg" class="msg"></div>
+      <button type="submit">Submit</button>
+    </form>
+    <a class="link" href="submissions.php">View all submissions &rarr;</a>
   </div>
-
-  <div class="card hidden" id="formCard">
-    <div class="topbar">
-      <span>Signed in as <strong id="whoami"></strong></span>
-      <span>
-        <a href="view_submissions.php" style="color: var(--accent); font-weight: 600; text-decoration: none; margin-right: 14px;">View data</a>
-        <button class="logout" onclick="doLogout()">Log out</button>
-      </span>
-    </div>
-
-    <h1>Contact Form</h1>
-    <p class="sub">Please fill in your details below. All fields are required.</p>
-
-    <div class="field">
-      <label for="name">Name <span class="req">*</span></label>
-      <input type="text" id="name" placeholder="Full name" autocomplete="name">
-    </div>
-
-    <div class="field">
-      <label for="email">Email <span class="req">*</span></label>
-      <input type="email" id="email" placeholder="name@example.com" autocomplete="email">
-    </div>
-
-    <div class="field">
-      <label for="address">Address <span class="req">*</span></label>
-      <textarea id="address" placeholder="Street, city, state, PIN code" autocomplete="street-address"></textarea>
-    </div>
-
-    <button class="primary" id="submitBtn" onclick="submitForm()">Submit</button>
-    <button class="primary" id="downloadBtn" style="background:#3a3f47; margin-top:10px;" onclick="downloadPDF()">Download as PDF</button>
-    <div id="msg" class="msg"></div>
-  </div>
-
-  <script>
-    var BACKEND_URL = '.';
-
-    function showMsg(id, text, type) {
-      var el = document.getElementById(id);
-      el.textContent = text;
-      el.className = 'msg ' + type;
-    }
-
-    function clearMsg(id) {
-      document.getElementById(id).className = 'msg';
-    }
-
-    window.addEventListener('DOMContentLoaded', function () {
-      fetch(BACKEND_URL + '/check_session.php', { credentials: 'include' })
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          if (data.loggedIn) {
-            document.getElementById('whoami').textContent = data.username;
-            document.getElementById('loginCard').classList.add('hidden');
-            document.getElementById('formCard').classList.remove('hidden');
-          }
-        })
-        .catch(function () { });
-    });
-
-    function doLogin() {
-      var user = document.getElementById('loginUser').value.trim();
-      var pass = document.getElementById('loginPass').value;
-
-      if (!user || !pass) {
-        showMsg('loginMsg', 'Please enter both login ID and password.', 'err');
-        return;
-      }
-
-      var loginBtn = document.getElementById('loginBtn');
-      loginBtn.disabled = true;
-      clearMsg('loginMsg');
-
-      fetch(BACKEND_URL + '/login.php', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user, password: pass })
-      })
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          loginBtn.disabled = false;
-          if (data.success) {
-            document.getElementById('whoami').textContent = data.username;
-            document.getElementById('loginPass').value = '';
-            clearMsg('loginMsg');
-            document.getElementById('loginCard').classList.add('hidden');
-            document.getElementById('formCard').classList.remove('hidden');
-          } else {
-            showMsg('loginMsg', data.message || 'Invalid username or password.', 'err');
-          }
-        })
-        .catch(function () {
-          loginBtn.disabled = false;
-          showMsg('loginMsg', 'Server se connect nahi ho paya. Backend check karein.', 'err');
-        });
-    }
-
-    function doLogout() {
-      fetch(BACKEND_URL + '/logout.php', { method: 'POST', credentials: 'include' })
-        .finally(function () {
-          clearMsg('msg');
-          document.getElementById('formCard').classList.add('hidden');
-          document.getElementById('loginCard').classList.remove('hidden');
-        });
-    }
-
-    function downloadPDF() {
-      var name = document.getElementById('name').value.trim();
-      var email = document.getElementById('email').value.trim();
-      var address = document.getElementById('address').value.trim();
-
-      if (!name || !email || !address) {
-        showMsg('msg', 'Please fill in all fields before downloading.', 'err');
-        return;
-      }
-
-      var jsPDFLib = window.jspdf && window.jspdf.jsPDF;
-      if (!jsPDFLib) {
-        showMsg('msg', 'PDF library abhi load nahi hui, thodi der baad try karein.', 'err');
-        return;
-      }
-
-      var doc = new jsPDFLib();
-      var pageWidth = doc.internal.pageSize.getWidth();
-      var marginX = 15;
-      var y = 25;
-
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(18);
-      doc.text('Contact Details', marginX, y);
-
-      doc.setDrawColor(26, 95, 180);
-      doc.setLineWidth(0.5);
-      y += 5;
-      doc.line(marginX, y, pageWidth - marginX, y);
-
-      y += 15;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text('Name:', marginX, y);
-      doc.setFont('helvetica', 'normal');
-      doc.text(name, marginX + 30, y);
-
-      y += 10;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Email:', marginX, y);
-      doc.setFont('helvetica', 'normal');
-      doc.text(email, marginX + 30, y);
-
-      y += 10;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Address:', marginX, y);
-      doc.setFont('helvetica', 'normal');
-      var addressLines = doc.splitTextToSize(address, pageWidth - marginX - 30 - marginX);
-      doc.text(addressLines, marginX + 30, y);
-
-      var now = new Date();
-      var timestamp = now.toLocaleString();
-      y += 10 + (addressLines.length - 1) * 7 + 15;
-      doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.text('Generated on: ' + timestamp, marginX, y);
-
-      var fileSafeName = name.replace(/[^a-z0-9]+/gi, '_').toLowerCase() || 'contact';
-      doc.save(fileSafeName + '_details.pdf');
-    }
-
-    document.getElementById('loginPass').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') doLogin();
-    });
-
-    function submitForm() {
-      var name = document.getElementById('name').value.trim();
-      var email = document.getElementById('email').value.trim();
-      var address = document.getElementById('address').value.trim();
-
-      if (!name || !email || !address) {
-        showMsg('msg', 'Please fill in all fields.', 'err');
-        return;
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showMsg('msg', 'Please enter a valid email address.', 'err');
-        return;
-      }
-
-      var submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
-
-      fetch(BACKEND_URL + '/submit.php', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, email: email, address: address })
-      })
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          submitBtn.disabled = false;
-          if (data.success) {
-            showMsg('msg', data.message || 'Thank you! Your details have been submitted.', 'ok');
-            document.getElementById('name').value = '';
-            document.getElementById('email').value = '';
-            document.getElementById('address').value = '';
-          } else {
-            showMsg('msg', data.message || 'Kuch galat ho gaya, dobara try karein.', 'err');
-          }
-        })
-        .catch(function () {
-          submitBtn.disabled = false;
-          showMsg('msg', 'Server se connect nahi ho paya. Backend check karein.', 'err');
-        });
-    }
-  </script>
 </body>
 </html>
