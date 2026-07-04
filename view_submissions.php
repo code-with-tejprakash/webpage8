@@ -1,11 +1,9 @@
 <?php
 require_once 'config.php';
-
 if (!isset($_SESSION['username'])) {
     header('Location: index.html');
     exit;
 }
-
 $pdo = getDbConnection();
 $stmt = $pdo->query('SELECT id, name, email, address, submitted_by, created_at FROM submissions ORDER BY created_at DESC');
 $rows = $stmt->fetchAll();
@@ -88,6 +86,23 @@ $rows = $stmt->fetchAll();
       color: var(--muted);
       margin-bottom: 12px;
     }
+    .copy-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-btn:hover { opacity: 0.9; }
+    .copy-btn.copied { background: #2e7d32; }
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
   </style>
 </head>
 <body>
@@ -99,12 +114,13 @@ $rows = $stmt->fetchAll();
       </div>
       <a href="index.html">&larr; Back to form</a>
     </div>
-
     <p class="count"><?php echo count($rows); ?> total submission(s)</p>
-
+    <div class="toolbar">
+      <button class="copy-btn" id="copyBtn" onclick="copyTable()">Copy table</button>
+    </div>
     <div class="card">
       <?php if (count($rows) > 0): ?>
-        <table>
+        <table id="submissionsTable">
           <thead>
             <tr>
               <th>ID</th>
@@ -133,5 +149,33 @@ $rows = $stmt->fetchAll();
       <?php endif; ?>
     </div>
   </div>
+
+  <script>
+    function copyTable() {
+      const table = document.getElementById('submissionsTable');
+      if (!table) return;
+
+      let text = '';
+      const rows = table.querySelectorAll('tr');
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('th, td');
+        const rowText = Array.from(cells).map(cell => cell.innerText.trim()).join('\t');
+        text += rowText + '\n';
+      });
+
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove('copied');
+        }, 1500);
+      }).catch(() => {
+        alert('Copy fail ho gaya, browser permission check karein.');
+      });
+    }
+  </script>
 </body>
 </html>
